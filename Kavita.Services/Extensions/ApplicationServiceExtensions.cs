@@ -9,6 +9,7 @@ using Kavita.API.Services.Scanner;
 using Kavita.API.Services.SignalR;
 using Kavita.Services.Helpers;
 using Kavita.Services.HostedServices;
+using Kavita.Services.Import;
 using Kavita.Services.Metadata;
 using Kavita.Services.Plus;
 using Kavita.Services.Reading;
@@ -95,6 +96,12 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IReadingHistoryService, ReadingHistoryService>();
         services.AddScoped<IClientDeviceService, ClientDeviceService>();
         services.AddScoped<IDeviceTrackingService, DeviceTrackingService>();
+
+        // Register Import Services
+        services.AddScoped<IKavitaImporterService, KavitaImporterService>();
+        services.AddScoped<IFormatDetectorService, FormatDetectorService>();
+        services.AddScoped<IDirectoryStructureBuilder, DirectoryStructureBuilder>();
+        services.AddScoped<IImportConfigurationService, ImportConfigurationService>();
 
 
         services.AddSingleton<IReadingSessionService, ReadingSessionService>();
