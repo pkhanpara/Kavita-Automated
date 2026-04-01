@@ -546,3 +546,7 @@ Kavita.Services.Tests/Test Data/ScannerService/ScanTests/**/*
 
 
 Kavita.Server/config/appsettings.*.json
+
+.ocx/
+.opencode/
+

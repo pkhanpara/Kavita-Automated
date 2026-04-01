@@ -212,5 +212,11 @@ public enum ServerSettingKey
     /// </summary>
     /// <remarks>After a set amount, the Stats API will stop recording some information, like Average I/O time</remarks>
     [Description("StatsApiHits")]
-    StatsApiHits = 42
+    StatsApiHits = 42,
+    /// <summary>
+    /// Import configuration settings for the Kavita Importer service
+    /// </summary>
+    /// <remarks>Manages import folder configuration, format preferences, and blacklisting settings</remarks>
+    [Description("ImportConfiguration")]
+    ImportConfiguration = 43
 }
