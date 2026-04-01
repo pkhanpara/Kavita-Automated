@@ -58,22 +58,3 @@ public static class StatusCodes
     public const int Status504GatewayTimeout = 504;
 }
 
-/// <summary>
-/// Marker class for Status200OK
-/// </summary>
-public class Status200OK;
-
-/// <summary>
-/// Marker class for Status400BadRequest
-/// </summary>
-public class Status400BadRequest;
-
-/// <summary>
-/// Marker class for Status404NotFound
-/// </summary>
-public class Status404NotFound;
-
-/// <summary>
-/// Marker class for StatusInternalServerError
-/// </summary>
-public class StatusInternalServerError;

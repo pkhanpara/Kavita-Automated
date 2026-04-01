@@ -92,7 +92,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving import configuration");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to retrieve configuration" });
+            return StatusCode.Status500InternalServerError;
         }
     }
 
