@@ -1,4 +1,4 @@
-﻿# [<img src="/Logo/kavitaautomated.svg" width="32" alt="">]() Kavita-Automated
+﻿# [<img src="/Logo/kavita-automated.svg" width="32" alt="">]() Kavita-Automated
 <div align="center">
 
 ![new_github_preview_stills](https://github.com/user-attachments/assets/f016b34f-3c4c-4f07-8e72-12cd6f4e71ea)
@@ -20,13 +20,13 @@ your reading collection with your friends and family!
 [![Release](https://img.shields.io/github/release/pkhanpara/Kavita-Automated.svg?style=flat&maxAge=3600)](https://github.com/pkhanpara/Kavita-Automated/releases)
 [![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat)](https://github.com/pkhanpara/Kavita-Automated/blob/master/LICENSE)
 [![Downloads](https://img.shields.io/github/downloads/pkhanpara/Kavita-Automated/total.svg?style=flat)](https://github.com/pkhanpara/Kavita-Automated/releases)
-[![Docker Pulls](https://img.shields.io/docker/pulls/pkhanpara/kavitaautomated.svg)](https://hub.docker.com/r/pkhanpara/kavitaautomated)
+[![Docker Pulls](https://img.shields.io/docker/pulls/pkhanpara/kavita-automated.svg)](https://hub.docker.com/r/pkhanpara/kavita-automated)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Kareadita_Kavita&metric=sqale_rating)](https://sonarcloud.io/dashboard?id=Kareadita_Kavita)
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=Kareadita_Kavita&metric=security_rating)](https://sonarcloud.io/dashboard?id=Kareadita_Kavita)
-[![Backers on Open Collective](https://opencollective.com/kavitaautomated/backers/badge.svg)](#backers)
-[![Sponsors on Open Collective](https://opencollective.com/kavitaautomated/sponsors/badge.svg)](#sponsors)
-<a href="https://hosted.weblate.org/engage/kavitaautomated/">
-<img src="https://hosted.weblate.org/widgets/kavitaautomated/-/ui/svg-badge.svg" alt="Translation status" />
+[![Backers on Open Collective](https://opencollective.com/kavita-automated/backers/badge.svg)](#backers)
+[![Sponsors on Open Collective](https://opencollective.com/kavita-automated/sponsors/badge.svg)](#sponsors)
+<a href="https://hosted.weblate.org/engage/kavita-automated/">
+<img src="https://hosted.weblate.org/widgets/kavita-automated/-/ui/svg-badge.svg" alt="Translation status" />
 </a>
 <img src="https://img.shields.io/endpoint?url=https://stats.kavita-automated.com/api/ui/shield-badge"/>
 </div>
@@ -41,7 +41,7 @@ your reading collection with your friends and family!
 - Ability to manage users with rich Role-based management for age restrictions, abilities within the app, OIDC, etc
 - Rich web readers supporting webtoon, continuous reading mode (continue without leaving the reader), virtual pages (epub), etc
 - Ability to customize your dashboard and side nav with smart filters, custom order and visibility toggles
-- Full Localization Support ([Weblate](https://hosted.weblate.org/engage/kavitaautomatedautomated/))
+- Full Localization Support ([Weblate](https://hosted.weblate.org/engage/kavita-automatedautomated/))
 - Epub-based Annotation/Highlight support 
 
 ## Support
@@ -76,20 +76,25 @@ vision. You may lose data and have to restart. The Kavita team strives to avoid 
 
 ## Donate
 If you like Kavita-Automated, have gotten good use out of it, or feel like you want to say thanks with a few bucks, feel free to donate. Money will go towards
-expenses related to the project. Back us through [OpenCollective](https://opencollective.com/Kavita#backer). You can also use [Paypal](https://www.paypal.com/paypalme/majora2007?locale.x=en_US), however your name will not show below. Kavita+ is also an 
-option which provides funding, and you get a benefit.
+expenses related to the project. Back us through [OpenCollective](https://opencollective.com/kavita-automated#backer). You can also use [Paypal](https://paypal.me/PoojanKhanpara), however your name will not show below. 
 
 ## Localization
-Thank you to [Weblate](https://hosted.weblate.org/engage/kavitaautomated/) who hosts our localization infrastructure pro bono. If you want to see Kavita in your language, please help us localize.
+Thank you to [Weblate](https://hosted.weblate.org/engage/kavita-automated/) who hosts our localization infrastructure pro bono. If you want to see Kavita in your language, please help us localize.
 
-<a href="https://hosted.weblate.org/engage/kavitaautomated/">
-<img src="https://hosted.weblate.org/widget/kavitaautomated/horizontal-auto.svg" alt="Translation status" />
+<a href="https://hosted.weblate.org/engage/kavita-automated/">
+<img src="https://hosted.weblate.org/widget/kavita-automated/horizontal-auto.svg" alt="Translation status" />
 </a>
 
 
 ## Contributors
+This project contributors
+<a href="https://github.com/pkhanpara/Kavita-Automated/graphs/contributors">
+<img src="https://opencollective.com/kavita-automated/contributors.svg?width=890&button=false&avatarHeight=42" />
+</a>
 
-This project exists thanks to all the people who contribute and downstream library maintainers. [Contribute](CONTRIBUTING.md).
+
+
+This project exists thanks to the original contributors. [Contribute](CONTRIBUTING.md).
 <a href="https://github.com/Kareadita/Kavita/graphs/contributors">
 <img src="https://opencollective.com/kavita/contributors.svg?width=890&button=false&avatarHeight=42" />
 </a>
@@ -97,23 +102,17 @@ This project exists thanks to all the people who contribute and downstream libra
 
 ## Backers
 
-Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/kavitaautomated#backer)
+Thank you to all our backers! 🙏 [Become a backer](https://opencollective.com/kavita-automated#backer)
 
-<img src="https://opencollective.com/kavitaAutomated/backers.svg?width=890&avatarHeight=42"></a>
+<img src="https://opencollective.com/kavita-automated/backers.svg?width=890&avatarHeight=42"></a>
 
 ## Sponsors
 
-Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor](https://opencollective.com/kavitaautomated#sponsor)
+Support this project by becoming a sponsor. Your logo will show up here with a link to your website. [Become a sponsor](https://opencollective.com/kavita-automated#sponsor)
 
-<img src="https://opencollective.com/kavitaautomated/sponsors.svg?width=890"></a>
+<img src="https://opencollective.com/kavita-automated/sponsors.svg?width=890"></a>
 
-**Shoutout:** Special thanks to our community sponsors and contributors who help make Kavita-Automated possible. Visit [OpenCollective](https://opencollective.com/kavitaautomated) to learn more about sponsorship opportunities.
-
-## Mega Sponsors
-<img src="https://opencollective.com/Kavita/tiers/mega-sponsor.svg?width=890"></a>
-
-## Powered By
-[![JetBrains logo.](https://resources.jetbrains.com/storage/products/company/brand/logos/jetbrains.svg)](https://jb.gg/OpenSource)
+**Shoutout:** Special thanks to our community sponsors and contributors who help make Kavita-Automated possible. Visit [OpenCollective](https://opencollective.com/kavita-automated) to learn more about sponsorship opportunities.
 
 ### Repository Information
 - **Current Repository:** [pkhanpara/Kavita-Automated](https://github.com/pkhanpara/Kavita-Automated)
