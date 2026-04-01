@@ -45,7 +45,6 @@ your reading collection with your friends and family!
 - Epub-based Annotation/Highlight support 
 
 ## Support
-[![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60)](https://discord.gg/eczRp9eeem)
 [![GitHub - Bugs Only](https://img.shields.io/badge/github-issues-red.svg?maxAge=60)](https://github.com/Kareadita/Kavita/issues)
 
 ## Demo
