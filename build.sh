@@ -3,6 +3,32 @@ set -e
 
 outputFolder='_output'
 
+# Initialize flags
+RUNTIME_ONLY=false
+UI_ONLY=false
+RID=""
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --runtime-only)
+            RUNTIME_ONLY=true
+            shift
+            ;;
+        --ui-only)
+            UI_ONLY=true
+            shift
+            ;;
+        *)
+            # Check if it's a runtime identifier (not a flag)
+            if [[ ! "$1" =~ ^-- ]]; then
+                RID="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
 CheckRequirements()
 {
     if ! command -v npm &> /dev/null
@@ -38,9 +64,9 @@ Build()
 
     if [[ -z "$RID" ]];
     then
-        dotnet msbuild -restore $slnFile -p:Configuration=Release -p:Platform="Any CPU"
+        dotnet msbuild -restore $slnFile -p:Configuration=Release -p:Platform="Any CPU" 
     else
-        dotnet msbuild -restore $slnFile -p:Configuration=Release -p:Platform="Any CPU" -p:RuntimeIdentifiers=$RID
+        dotnet msbuild -restore $slnFile -p:Configuration=Release -p:Platform="Any CPU" -p:RuntimeIdentifiers=$RID 
     fi
 
     ProgressEnd 'Build'
@@ -73,8 +99,8 @@ Package()
     # TODO: Use no-restore? Because Build should have already done it for us
     echo "Building"
     cd Kavita.Server
-    echo dotnet publish -c Release --self-contained --runtime $runtime -o "$lOutputFolder"
-    dotnet publish -c Release --self-contained --runtime $runtime -o "$lOutputFolder"
+    echo dotnet publish -c Release --self-contained --runtime $runtime -o "$lOutputFolder" 
+    dotnet publish -c Release --self-contained --runtime $runtime -o "$lOutputFolder" 
 
     echo "Recopying wwwroot due to bug"
     cp -R ./wwwroot/* $lOutputFolder/wwwroot
@@ -113,33 +139,73 @@ Package()
 }
 
 
-RID="$1"
-
-CheckRequirements
-BuildUI
-Build
-
-dir=$PWD
-
-if [[ -z "$RID" ]];
-then
-    Package "win-x64"
-    cd "$dir"
-    Package "win-x86"
-    cd "$dir"
-    Package "linux-x64"
-    cd "$dir"
-    Package "linux-arm"
-    cd "$dir"
-    Package "linux-arm64"
-    cd "$dir"
-    Package "linux-musl-x64"
-    cd "$dir"
-    Package "osx-x64"
-    cd "$dir"
-    Package "osx-arm64"
-    cd "$dir"
-else
+# Main execution logic based on flags
+if [[ "$UI_ONLY" == "true" ]]; then
+    # Build UI only (no .NET build or packaging)
+    echo "========================================="
+    echo "Mode: UI Only"
+    echo "========================================="
+    CheckRequirements
+    BuildUI
+    echo "========================================="
+    echo "UI build completed successfully!"
+    echo "========================================="
+elif [[ "$RUNTIME_ONLY" == "true" ]]; then
+    # Build only specified runtime (skip UI rebuild and full .NET build)
+    echo "========================================="
+    echo "Mode: Runtime Only"
+    echo "Runtime: $RID"
+    echo "========================================="
+    
+    if [[ -z "$RID" ]]; then
+        echo "Error: Please specify a runtime identifier with --runtime-only"
+        echo "Usage: ./build.sh --runtime-only linux-x64"
+        exit 1
+    fi
+    
+    CheckRequirements
+    # Skip BuildUI() to use existing UI
+    echo "Skipping UI rebuild (using existing build)"
+    dir=$PWD
     Package "$RID"
     cd "$dir"
+    echo "========================================="
+    echo "Runtime package created successfully!"
+    echo "========================================="
+else
+    # Default: Build UI + All runtimes (or specified RID)
+    echo "========================================="
+    echo "Mode: Full Build"
+    echo "========================================="
+    CheckRequirements
+    BuildUI
+    Build
+
+    dir=$PWD
+
+    if [[ -z "$RID" ]];
+    then
+        Package "win-x64"
+        cd "$dir"
+        Package "win-x86"
+        cd "$dir"
+        Package "linux-x64"
+        cd "$dir"
+        Package "linux-arm"
+        cd="$dir"
+        Package "linux-arm64"
+        cd "$dir"
+        Package "linux-musl-x64"
+        cd "$dir"
+        Package "osx-x64"
+        cd "$dir"
+        Package "osx-arm64"
+        cd="$dir"
+    else
+        Package "$RID"
+        cd "$dir"
+    fi
+    echo "========================================="
+    echo "Full build completed successfully!"
+    echo "========================================="
 fi
