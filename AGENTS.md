@@ -22,6 +22,9 @@ The build system supports three execution modes for flexible development workflo
 
 # Build only linux-arm64 runtime
 ./build.sh --runtime-only linux-arm64
+
+Make sure there are no errors in the output. Ignore warnings unless told so. 
+
 ```
 
 **3. UI-Only Mode**

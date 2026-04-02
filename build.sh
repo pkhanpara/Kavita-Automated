@@ -64,9 +64,9 @@ Build()
 
     if [[ -z "$RID" ]];
     then
-        dotnet msbuild -restore $slnFile -p:Configuration=Release -p:Platform="Any CPU" -v q
+        dotnet msbuild -restore $slnFile -p:Configuration=Release -p:Platform="Any CPU" 
     else
-        dotnet msbuild -restore $slnFile -p:Configuration=Release -p:Platform="Any CPU" -p:RuntimeIdentifiers=$RID -v q
+        dotnet msbuild -restore $slnFile -p:Configuration=Release -p:Platform="Any CPU" -p:RuntimeIdentifiers=$RID 
     fi
 
     ProgressEnd 'Build'
@@ -99,8 +99,8 @@ Package()
     # TODO: Use no-restore? Because Build should have already done it for us
     echo "Building"
     cd Kavita.Server
-    echo dotnet publish -c Release --self-contained --runtime $runtime -o "$lOutputFolder" -v q
-    dotnet publish -c Release --self-contained --runtime $runtime -o "$lOutputFolder" -v q
+    echo dotnet publish -c Release --self-contained --runtime $runtime -o "$lOutputFolder" 
+    dotnet publish -c Release --self-contained --runtime $runtime -o "$lOutputFolder" 
 
     echo "Recopying wwwroot due to bug"
     cp -R ./wwwroot/* $lOutputFolder/wwwroot
