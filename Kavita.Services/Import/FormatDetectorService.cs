@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Kavita.Models.Entities.Enums;
+using Microsoft.Extensions.Logging;
 
 namespace Kavita.Services.Import;
 
@@ -261,6 +262,15 @@ public class FormatDetectorService : IFormatDetectorService
     /// <param name="priority">The priority value</param>
     /// <param name="extensions">The file extensions associated with the format</param>
     /// <returns>A new FormatPriority instance</returns>
+    /// <summary>
+    /// Gets the currently configured format priorities
+    /// </summary>
+    /// <returns>The configured format priorities</returns>
+    public IReadOnlyCollection<FormatPriority> GetFormatPriorities()
+    {
+        return _formatPriorities.Values.ToList();
+    }
+
     public FormatPriority CreateFormatPriority(
         MediaFormat format,
         int priority,
@@ -444,4 +454,10 @@ public interface IFormatDetectorService
     /// <param name="extensions">The file extensions associated with the format</param>
     /// <returns>A new FormatPriority instance</returns>
     FormatPriority CreateFormatPriority(MediaFormat format, int priority, params string[] extensions);
+
+    /// <summary>
+    /// Gets the currently configured format priorities
+    /// </summary>
+    /// <returns>The configured format priorities</returns>
+    IReadOnlyCollection<FormatPriority> GetFormatPriorities();
 }

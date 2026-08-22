@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Kavita.Models.Entities.Enums;
+using Kavita.API.Services;
 using Microsoft.Extensions.Logging;
 
 namespace Kavita.Services.Import;
@@ -18,8 +19,8 @@ public class KavitaImporterService : IKavitaImporterService, IDisposable
     private readonly ILogger<KavitaImporterService> _logger;
     private readonly IDirectoryService _directoryService;
     private readonly ImportSettings _settings;
-    private readonly FormatDetectorService _formatDetector;
-    private readonly DirectoryStructureBuilder _directoryBuilder;
+    private readonly IFormatDetectorService _formatDetector;
+    private readonly IDirectoryStructureBuilder _directoryBuilder;
     private readonly ImportFolderWatcher _folderWatcher;
     private readonly Dictionary<string, ImportFileStatus> _importedFiles;
     private readonly CancellationTokenSource _cancellationTokenSource;
@@ -32,16 +33,22 @@ public class KavitaImporterService : IKavitaImporterService, IDisposable
     /// </summary>
     /// <param name="logger">The logger instance for logging operations</param>
     /// <param name="directoryService">The directory service for file system operations</param>
+    /// <param name="formatDetector">The format detector service</param>
+    /// <param name="directoryBuilder">The directory structure builder</param>
+    /// <param name="watcherLogger">Logger for the import folder watcher</param>
     public KavitaImporterService(
         ILogger<KavitaImporterService> logger,
-        IDirectoryService directoryService)
+        IDirectoryService directoryService,
+        IFormatDetectorService formatDetector,
+        IDirectoryStructureBuilder directoryBuilder,
+        ILogger<ImportFolderWatcher> watcherLogger)
     {
         _logger = logger;
         _directoryService = directoryService;
         _settings = new ImportSettings();
-        _formatDetector = new FormatDetectorService();
-        _directoryBuilder = new DirectoryStructureBuilder();
-        _folderWatcher = new ImportFolderWatcher(logger);
+        _formatDetector = formatDetector;
+        _directoryBuilder = directoryBuilder;
+        _folderWatcher = new ImportFolderWatcher(watcherLogger);
         _importedFiles = new Dictionary<string, ImportFileStatus>(StringComparer.OrdinalIgnoreCase);
         _cancellationTokenSource = new CancellationTokenSource();
     }
@@ -81,29 +88,45 @@ public class KavitaImporterService : IKavitaImporterService, IDisposable
 
         try
         {
-            _logger.LogInformation("Initializing Kavita Importer service...");
-
-            // Validate and create import folder if it doesn't exist
-            await EnsureImportFolderExistsAsync(cancellationToken);
-
-            // Load preferred formats from configuration
-            await LoadPreferredFormatsAsync(cancellationToken);
-
-            // Initialize the directory structure
-            await _directoryBuilder.InitializeAsync(_settings.ImportFolderPath, cancellationToken);
+            await InitializeCoreAsync(cancellationToken);
 
             // Start the folder watcher
             await StartMonitoringAsync(cancellationToken);
-
-            _isInitialized = true;
-            _logger.LogInformation("Kavita Importer service initialized successfully");
-            _logger.LogInformation(BlacklistConfiguration.GetConfigurationSummary());
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error initializing Kavita Importer service");
             throw;
         }
+    }
+
+    /// <summary>
+    /// Performs the core initialization (folder validation, format priorities, directory
+    /// structure) without starting the folder watcher. Safe to call multiple times.
+    /// </summary>
+    /// <param name="cancellationToken">A token to cancel the initialization operation</param>
+    /// <returns>A task representing the asynchronous operation</returns>
+    private async Task InitializeCoreAsync(CancellationToken cancellationToken)
+    {
+        if (_isInitialized)
+        {
+            return;
+        }
+
+        _logger.LogInformation("Initializing Kavita Importer service...");
+
+        // Validate and create import folder if it doesn't exist
+        await EnsureImportFolderExistsAsync(cancellationToken);
+
+        // Load preferred formats from configuration
+        await LoadPreferredFormatsAsync(cancellationToken);
+
+        // Initialize the directory structure
+        await _directoryBuilder.InitializeAsync(_settings.ImportFolderPath, cancellationToken);
+
+        _isInitialized = true;
+        _logger.LogInformation("Kavita Importer service initialized successfully");
+        _logger.LogInformation(BlacklistConfiguration.GetConfigurationSummary());
     }
 
     /// <summary>
@@ -178,6 +201,8 @@ public class KavitaImporterService : IKavitaImporterService, IDisposable
             return;
         }
 
+        await InitializeCoreAsync(cancellationToken);
+
         try
         {
             _logger.LogInformation("Starting import folder monitoring...");
@@ -251,6 +276,8 @@ public class KavitaImporterService : IKavitaImporterService, IDisposable
 
         try
         {
+            await InitializeCoreAsync(cancellationToken);
+
             _logger.LogInformation("Starting import operation for: {SourcePath}", sourcePath);
 
             var importFileStatus = await ProcessSourceAsync(sourcePath, importId, cancellationToken);
@@ -407,33 +434,40 @@ public class KavitaImporterService : IKavitaImporterService, IDisposable
     /// </summary>
     /// <param name="sender">The event sender</param>
     /// <param name="filePath">The path of the created file</param>
-    private async Task OnFileCreated(object sender, string filePath)
+    private async void OnFileCreated(object? sender, string filePath)
     {
-        _logger.LogTrace("File created event: {FilePath}", filePath);
-
-        if (BlacklistConfiguration.IsFolderBlacklisted(filePath) ||
-            BlacklistConfiguration.IsFileBlacklisted(filePath))
+        try
         {
-            _logger.LogDebug("Blacklisted file created: {FilePath}", filePath);
-            return;
-        }
+            _logger.LogTrace("File created event: {FilePath}", filePath);
 
-        var importId = Guid.NewGuid();
-        var importStatus = await ProcessSourceAsync(filePath, importId, _cancellationTokenSource.Token);
-
-        if (importStatus != null)
-        {
-            importStatus.Status = ImportStatus.Processing;
-            importStatus.Actions.Add("File created and queued for processing");
-
-            if (BlacklistConfiguration.IsDownloadFile(filePath))
+            if (BlacklistConfiguration.IsFolderBlacklisted(filePath) ||
+                BlacklistConfiguration.IsFileBlacklisted(filePath))
             {
-                importStatus.Status = ImportStatus.Downloading;
-                importStatus.Actions.Add("File is a download file");
+                _logger.LogDebug("Blacklisted file created: {FilePath}", filePath);
+                return;
             }
 
-            _importedFiles[filePath] = importStatus;
-            _logger.LogInformation("Tracked new file: {FileName}", importStatus.FileName);
+            var importId = Guid.NewGuid();
+            var importStatus = await ProcessSourceAsync(filePath, importId, _cancellationTokenSource.Token);
+
+            if (importStatus != null)
+            {
+                importStatus.Status = ImportStatus.Processing;
+                importStatus.Actions.Add("File created and queued for processing");
+
+                if (BlacklistConfiguration.IsDownloadFile(filePath))
+                {
+                    importStatus.Status = ImportStatus.Downloading;
+                    importStatus.Actions.Add("File is a download file");
+                }
+
+                _importedFiles[filePath] = importStatus;
+                _logger.LogInformation("Tracked new file: {FileName}", importStatus.FileName);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error handling file created event for {FilePath}", filePath);
         }
     }
 
@@ -442,7 +476,7 @@ public class KavitaImporterService : IKavitaImporterService, IDisposable
     /// </summary>
     /// <param name="sender">The event sender</param>
     /// <param name="filePath">The path of the changed file</param>
-    private async Task OnFileChanged(object sender, string filePath)
+    private void OnFileChanged(object? sender, string filePath)
     {
         _logger.LogTrace("File changed event: {FilePath}", filePath);
 
@@ -469,7 +503,7 @@ public class KavitaImporterService : IKavitaImporterService, IDisposable
     /// </summary>
     /// <param name="sender">The event sender</param>
     /// <param name="filePath">The path of the deleted file</param>
-    private async Task OnFileDeleted(object sender, string filePath)
+    private void OnFileDeleted(object? sender, string filePath)
     {
         _logger.LogTrace("File deleted event: {FilePath}", filePath);
 
@@ -484,25 +518,33 @@ public class KavitaImporterService : IKavitaImporterService, IDisposable
     /// </summary>
     /// <param name="sender">The event sender</param>
     /// <param name="filePath">The path of the completed download</param>
-    private async Task OnDownloadComplete(object sender, string filePath)
+    private async void OnDownloadComplete(object? sender, DownloadCompletedEventArgs e)
     {
-        _logger.LogInformation("Download completed: {FilePath}", filePath);
-
-        if (_importedFiles.TryGetValue(filePath, out var downloadStatus))
+        var filePath = e.FilePath;
+        try
         {
-            downloadStatus.IsComplete = true;
-            downloadStatus.Status = ImportStatus.Completed;
-            downloadStatus.Actions.Add("Download completed");
+            _logger.LogInformation("Download completed: {FilePath}", filePath);
 
-            // Process the completed download
-            var targetPath = await _directoryBuilder.OrganizeFileAsync(
-                downloadStatus,
-                _settings.ImportFolderPath,
-                _settings.TargetLibraryPath,
-                _cancellationTokenSource.Token);
+            if (_importedFiles.TryGetValue(filePath, out var downloadStatus))
+            {
+                downloadStatus.IsComplete = true;
+                downloadStatus.Status = ImportStatus.Completed;
+                downloadStatus.Actions.Add("Download completed");
 
-            downloadStatus.TargetFolder = targetPath;
-            _logger.LogInformation("Download organized to: {TargetPath}", targetPath);
+                // Process the completed download
+                var targetPath = await _directoryBuilder.OrganizeFileAsync(
+                    downloadStatus,
+                    _settings.ImportFolderPath,
+                    _settings.TargetLibraryPath,
+                    _cancellationTokenSource.Token);
+
+                downloadStatus.TargetFolder = targetPath;
+                _logger.LogInformation("Download organized to: {TargetPath}", targetPath);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error handling download completion for {FilePath}", filePath);
         }
     }
 
@@ -633,4 +675,10 @@ public interface IKavitaImporterService : IDisposable
     /// <param name="cancellationToken">A token to cancel the operation</param>
     /// <returns>A task representing the asynchronous operation</returns>
     Task UpdateSettingsAsync(ImportSettings newSettings, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the import statistics for the current session
+    /// </summary>
+    /// <returns>A dictionary containing import statistics</returns>
+    Dictionary<string, object> GetStatistics();
 }

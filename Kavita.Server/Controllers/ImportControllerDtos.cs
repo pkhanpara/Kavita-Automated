@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Kavita.Models.Entities.Enums;
+using Kavita.Services.Import;
 
-namespace Kavita.API.Controllers;
+namespace Kavita.Server.Controllers;
 
 /// <summary>
 /// DTO for import configuration settings
@@ -19,7 +20,6 @@ public class ImportConfigurationDto
     /// <summary>
     /// Gets or sets the name of the import configuration
     /// </summary>
-    [Required]
     [StringLength(200)]
     public string Name { get; set; } = string.Empty;
 
@@ -218,6 +218,33 @@ public class ImportFileStatusDto
     /// Gets or sets the list of actions performed during the import process
     /// </summary>
     public List<string> Actions { get; set; } = new();
+
+    /// <summary>
+    /// Maps an ImportFileStatus model to its DTO representation
+    /// </summary>
+    /// <param name="status">The model to map</param>
+    /// <returns>The mapped DTO</returns>
+    public static ImportFileStatusDto FromModel(ImportFileStatus status)
+    {
+        return new ImportFileStatusDto
+        {
+            ImportId = status.ImportId,
+            FilePath = status.FilePath,
+            FileName = status.FileName,
+            Format = status.Format,
+            FileSize = status.FileSize,
+            CreatedAt = status.CreatedAt,
+            LastModified = status.LastModified,
+            Status = status.Status,
+            Priority = status.Priority,
+            ErrorMessage = status.ErrorMessage,
+            IsDownloadFile = status.IsDownloadFile,
+            IsComplete = status.IsComplete,
+            SourceFolder = status.SourceFolder,
+            TargetFolder = status.TargetFolder,
+            Actions = status.Actions
+        };
+    }
 }
 
 /// <summary>

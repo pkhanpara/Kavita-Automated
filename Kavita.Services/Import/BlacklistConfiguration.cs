@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -219,26 +220,16 @@ public static class BlacklistConfiguration
         ".jsx",
         ".tsx",
 
-        // Documentation formats
-        ".pdf",
+        // Documentation formats (media formats Kavita imports, like .pdf, must NOT be here)
         ".doc",
         ".docx",
         ".odt",
         ".rtf",
         ".tex",
 
-        // Image formats
-        ".png",
-        ".jpg",
-        ".jpeg",
-        ".gif",
-        ".bmp",
-        ".svg",
+        // Image formats not supported by the importer (supported ones such as
+        // .png/.jpg/.webp/.gif/.avif/.bmp/.svg/.tiff are importable and must NOT be here)
         ".ico",
-        ".webp",
-        ".tiff",
-        ".tif",
-        ".avif",
         ".heic",
         ".heif",
 
@@ -262,19 +253,11 @@ public static class BlacklistConfiguration
         ".wma",
         ".aiff",
 
-        // E-book formats
-        ".epub",
-        ".mobi",
+        // E-book formats not supported by the importer (.epub/.mobi/.azw3 are importable
+        // and must NOT be here)
         ".azw",
-        ".azw3",
         ".kfx",
         ".lrf",
-
-        // Comic book formats
-        ".cbz",
-        ".cbr",
-        ".cb7",
-        ".cbt",
 
         // Import-specific extensions
         ".partial",

@@ -5,14 +5,14 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Kavita.API.Controllers;
+using Microsoft.AspNetCore.Http;
 using Kavita.Models.Entities.Enums;
 using Kavita.Services.Import;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace Kavita.API.Controllers;
+namespace Kavita.Server.Controllers;
 
 /// <summary>
 /// Controller for managing the Kavita Importer functionality.
@@ -92,7 +92,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving import configuration");
-            return StatusCode.Status500InternalServerError;
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 
@@ -143,7 +143,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error updating import configuration");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to update configuration" });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to update configuration" });
         }
     }
 
@@ -178,9 +178,9 @@ public class ImportController : ControllerBase
                 ImportedFiles = totalImported,
                 FailedFiles = totalFailed,
                 SkippedFiles = totalSkipped,
-                ExecutionTime = results.Sum(r => r.ExecutionTime).ToString(@"mm\:ss\.fff"),
+                ExecutionTime = TimeSpan.FromTicks(results.Sum(r => r.ExecutionTime.Ticks)).ToString(@"mm\:ss\.fff"),
                 Summary = $"Successfully imported {totalImported} files with {totalFailed} failures",
-                ImportedFilesList = results.SelectMany(r => r.ImportedFilesList).ToList(),
+                ImportedFilesList = results.SelectMany(r => r.ImportedFilesList).Select(ImportFileStatusDto.FromModel).ToList(),
                 ErrorMessages = results.SelectMany(r => r.ErrorMessages).ToList()
             };
 
@@ -189,7 +189,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error importing files");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to import files", error = ex.Message });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to import files", error = ex.Message });
         }
     }
 
@@ -226,14 +226,14 @@ public class ImportController : ControllerBase
                 SkippedFiles = result.SkippedFiles,
                 ExecutionTime = result.ExecutionTime.ToString(@"mm\:ss\.fff"),
                 Summary = result.Summary,
-                ImportedFilesList = result.ImportedFilesList,
+                ImportedFilesList = result.ImportedFilesList.Select(ImportFileStatusDto.FromModel).ToList(),
                 ErrorMessages = result.ErrorMessages
             });
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error importing file: {FilePath}", filePath);
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to import file", error = ex.Message });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to import file", error = ex.Message });
         }
     }
 
@@ -273,7 +273,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving import statistics");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to retrieve statistics" });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to retrieve statistics" });
         }
     }
 
@@ -296,7 +296,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error starting import monitoring");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to start monitoring", error = ex.Message });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to start monitoring", error = ex.Message });
         }
     }
 
@@ -319,7 +319,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error stopping import monitoring");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to stop monitoring", error = ex.Message });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to stop monitoring", error = ex.Message });
         }
     }
 
@@ -348,7 +348,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving blacklisted folders");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to retrieve blacklisted folders" });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to retrieve blacklisted folders" });
         }
     }
 
@@ -369,7 +369,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving blacklisted patterns");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to retrieve blacklisted patterns" });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to retrieve blacklisted patterns" });
         }
     }
 
@@ -390,7 +390,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving download extensions");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to retrieve download extensions" });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to retrieve download extensions" });
         }
     }
 
@@ -418,7 +418,7 @@ public class ImportController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving supported formats");
-            return StatusCode(StatusCodes.StatusInternalServerError, new { message = "Failed to retrieve supported formats" });
+            return StatusCode(StatusCodes.Status500InternalServerError, new { message = "Failed to retrieve supported formats" });
         }
     }
 }

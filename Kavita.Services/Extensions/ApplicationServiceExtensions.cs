@@ -71,8 +71,8 @@ public static class ApplicationServiceExtensions
         services.AddScoped<ITachiyomiService, TachiyomiService>();
         services.AddScoped<ICollectionTagService, CollectionTagService>();
 
-        services.AddScoped<IFileSystem, FileSystem>();
-        services.AddScoped<IDirectoryService, DirectoryService>();
+        services.AddSingleton<IFileSystem, FileSystem>();
+        services.AddSingleton<IDirectoryService, DirectoryService>();
         services.AddScoped<IEventHub, EventHub>();
         services.AddScoped<IPresenceTracker, PresenceTracker>();
         services.AddScoped<IImageService, ImageService>();
@@ -97,11 +97,12 @@ public static class ApplicationServiceExtensions
         services.AddScoped<IClientDeviceService, ClientDeviceService>();
         services.AddScoped<IDeviceTrackingService, DeviceTrackingService>();
 
-        // Register Import Services
-        services.AddScoped<IKavitaImporterService, KavitaImporterService>();
-        services.AddScoped<IFormatDetectorService, FormatDetectorService>();
-        services.AddScoped<IDirectoryStructureBuilder, DirectoryStructureBuilder>();
-        services.AddScoped<IImportConfigurationService, ImportConfigurationService>();
+        // Register Import Services as singletons: the importer owns a FileSystemWatcher
+        // and in-memory import state that must survive across requests
+        services.AddSingleton<IKavitaImporterService, KavitaImporterService>();
+        services.AddSingleton<IFormatDetectorService, FormatDetectorService>();
+        services.AddSingleton<IDirectoryStructureBuilder, DirectoryStructureBuilder>();
+        services.AddSingleton<IImportConfigurationService, ImportConfigurationService>();
 
 
         services.AddSingleton<IReadingSessionService, ReadingSessionService>();

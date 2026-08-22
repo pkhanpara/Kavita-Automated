@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Kavita.Models.Entities.Enums;
+using Kavita.API.Services;
+using Microsoft.Extensions.Logging;
 
 namespace Kavita.Services.Import;
 
@@ -296,7 +298,7 @@ public class DirectoryStructureBuilder : IDirectoryStructureBuilder
 
             // Move or copy the file to the target location
             var finalPath = await MoveFileToTargetAsync(
-                sourcePath,
+                importStatus.FilePath,
                 targetPath,
                 importStatus,
                 cancellationToken);
